@@ -2,6 +2,8 @@ bin
 include
 lib
 .Python
+.pytest_cache
+pytest.ini
 tests/
 .envrc
 __pycache__
