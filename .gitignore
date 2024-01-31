@@ -7,5 +7,6 @@ pytest.ini
 tests/
 .envrc
 __pycache__
+.DS_Store
 
 guide-project-test.md
