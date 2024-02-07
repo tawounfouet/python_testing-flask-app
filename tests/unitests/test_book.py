@@ -32,9 +32,7 @@ def test_book_valid_booking(client, monkeypatch, clubs, competitions):
     assert response.status_code == 200
     
 
-
-
-
+    
 def test_book_nonexistent_competition(client):
     """
     Test booking for a non-existent competition.

@@ -136,7 +136,8 @@ def purchasePlaces():
     else:
         # Booking is successful.
         flash('Great-booking complete!')
-        # Update club points and competition places.
+        #flash(f'Great, succesfully booked {placesRequired} place(s)!')
+        #Update club points and competition places.
         club['points'] = int(club['points']) - placesRequired
         competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
     
