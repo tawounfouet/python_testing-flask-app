@@ -145,10 +145,16 @@ def purchasePlaces():
     return render_template("welcome.html", club=club, competitions=competitions)
 
 
-@app.route("/viewClubPoints")
-def view_club_points():
-    club_list = sorted(clubs, key=lambda club: club["name"])
-    return render_template("club_points.html", clubs=club_list)
+@app.route("/pointsBoard")
+def pointsBoard():
+    # Sort the clubs alphabetically by name
+    #club_list = sorted(clubs, key=lambda club: club["name"])
+
+    # Sort the clubs by points in descending order
+    club_list = sorted(clubs, key=lambda club: int(club["points"]), reverse=True)
+    
+    # Render the template with the sorted list of clubs
+    return render_template("points_board.html", clubs=club_list)
 
 
 
