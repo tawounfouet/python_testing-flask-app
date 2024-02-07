@@ -147,6 +147,12 @@ def purchasePlaces():
 
 @app.route("/pointsBoard")
 def pointsBoard():
+    """
+    Display the points board.
+
+    Returns:
+        A rendered template for the points board.
+    """
     # Sort the clubs alphabetically by name
     #club_list = sorted(clubs, key=lambda club: club["name"])
 
@@ -160,4 +166,10 @@ def pointsBoard():
 
 @app.route("/logout")
 def logout():
+    """
+    Redirects the user to the index page.
+
+    Returns:
+        A redirect response to the index page.
+    """
     return redirect(url_for("index"))
