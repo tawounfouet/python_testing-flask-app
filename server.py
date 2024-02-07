@@ -73,28 +73,18 @@ def book(competition,club):
 def purchasePlaces():
     """
     Purchase places for a competition.
-
-    This function retrieves the data from the form, including the competition name, club name, and number of places required.
-    It then searches for the corresponding competition and club in the data.
-    If the number of places required is greater than the club's points or the remaining places in the competition, an error message is displayed.
-    If the number of places required is greater than 12, an error message is displayed.
-    Otherwise, the booking is completed and the club's points and the number of remaining places in the competition are updated.
-
     Returns:
         A rendered template for the booking page with the updated club and competition information.
     """
+    global competitions
     
-    
-    # Get the data form the form.
+    # Get the data from the form.
     competition_name = request.form.get('competition')
     club_name = request.form.get('club')
 
     # Search for the corresponding competition and club.
     competition = [c for c in competitions if c['name'] == competition_name][0]
-    #club = [c for c in clubs if c['name'] == club_name][0]
-    #club = get_club(request.form["club"])
     club = next((c for c in clubs if c['name'] == club_name), None)
-   
 
     try:
         placesRequired = int(request.form['places'])
@@ -103,28 +93,31 @@ def purchasePlaces():
         return render_template("booking.html", club=club, competition=competition), 400
     
     placesRemaining = int(competition['numberOfPlaces'])
-    
 
+    # Check if the club has enough points.
     if placesRequired > int(club["points"]):
         flash("You don't have enough points.", "error")
         return render_template("booking.html", club=club, competition=competition), 400
 
+    # Check if there are enough places remaining in the competition.
     elif placesRequired > placesRemaining:
         flash("Not enough places available, you are trying to book more than the remaining places.", "error")
         return render_template("booking.html", club=club, competition=competition), 400
 
+    # Check if the number of places exceeds the limit.
     elif placesRequired > 12:
         flash("You can't book more than 12 places in a competition.", "error")
         return render_template("booking.html", club=club, competition=competition), 400
     
     else:
+        # Booking is successful.
         flash('Great-booking complete!')
+        # Update club points and competition places.
         club['points'] = int(club['points']) - placesRequired
         competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
     
-    return render_template('booking.html', club=club, competition=competition)
-    
-
+    # Render the welcome template with updated club and competition information.
+    return render_template("welcome.html", club=club, competitions=competitions)
 
 
 
