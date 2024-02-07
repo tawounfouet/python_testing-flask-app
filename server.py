@@ -1,5 +1,6 @@
 import json
-from flask import Flask,render_template,request,redirect,flash,url_for
+from datetime import datetime
+from flask import Flask, render_template, request, redirect, flash, url_for
 
 
 def loadClubs():
@@ -9,9 +10,9 @@ def loadClubs():
     Returns:
         list: The list of clubs.
     """
-    with open('clubs.json') as c:
-         listOfClubs = json.load(c)['clubs']
-         return listOfClubs
+    with open("clubs.json") as c:
+        listOfClubs = json.load(c)["clubs"]
+        return listOfClubs
 
 
 def loadCompetitions():
@@ -21,47 +22,42 @@ def loadCompetitions():
     Returns:
         list: The list of competitions.
     """
-    with open('competitions.json') as comps:
-         listOfCompetitions = json.load(comps)['competitions']
-         return listOfCompetitions
+    with open("competitions.json") as comps:
+        listOfCompetitions = json.load(comps)["competitions"]
+        return listOfCompetitions
 
 
 app = Flask(__name__)
-app.secret_key = 'something_special'
+app.secret_key = "something_special"
 
 competitions = loadCompetitions()
 clubs = loadClubs()
 
-@app.route('/')
+@app.route("/")
 def index():
-    return render_template('index.html')
+    return render_template("index.html")
 
 
-def getClub(email):
+def get_club(email):
     """Retourne le club correspondant à l'email donné, ou None si non trouvé."""
     for club in clubs:
-        if club['email'] == email:
+        if club["email"] == email:
             return club
     return None
 
 
-@app.route('/showSummary',methods=['POST'])
+
+@app.route("/showSummary", methods=["POST"])
 def showSummary():
-    try:
-        email = request.form['email']
-        club = getClub(email)
-        if club:
-            return render_template('welcome.html', club=club, competitions=competitions)
-        else:
-            flash(f"Error: email {email} not found")
-            return redirect(url_for('index'))
-    except:
-        flash(f"Error: email does not exist in the database")
-        return redirect(url_for('index'))
+    email = request.form["email"]
+    club = get_club(email)
+    if club is not None:
+        return render_template("welcome.html", club=club, competitions=competitions)
+    else:
+        flash(f"Error: email {email} not found")
+        return redirect(url_for("index"))
 
 
-
-# tester qu'est ce qui ce passe quand on passe un club ou une competition qui n'existe pas
 @app.route('/book/<competition>/<club>')
 def book(competition,club):
     foundClub = [c for c in clubs if c['name'] == club][0]
@@ -73,24 +69,65 @@ def book(competition,club):
         return render_template('welcome.html', club=club, competitions=competitions)
 
 
-# Lorsqu'il achete avec succes que ses points soite bien deduit
-# scenario alternative, s'il veut acheter plus de 12 places
-    # prevoir une constante globale max à 12 et le renvoyé dans le html via le render template
-@app.route('/purchasePlaces',methods=['POST'])
+@app.route('/purchasePlaces', methods=['POST'])
 def purchasePlaces():
-    competition = [c for c in competitions if c['name'] == request.form['competition']][0]
-    club = [c for c in clubs if c['name'] == request.form['club']][0]
-    placesRequired = int(request.form['places'])
-    competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
-    flash('Great-booking complete!')
-    return render_template('welcome.html', club=club, competitions=competitions)
+    """
+    Purchase places for a competition.
+
+    This function retrieves the data from the form, including the competition name, club name, and number of places required.
+    It then searches for the corresponding competition and club in the data.
+    If the number of places required is greater than the club's points or the remaining places in the competition, an error message is displayed.
+    If the number of places required is greater than 12, an error message is displayed.
+    Otherwise, the booking is completed and the club's points and the number of remaining places in the competition are updated.
+
+    Returns:
+        A rendered template for the booking page with the updated club and competition information.
+    """
+    
+    
+    # Get the data form the form.
+    competition_name = request.form.get('competition')
+    club_name = request.form.get('club')
+
+    # Search for the corresponding competition and club.
+    competition = [c for c in competitions if c['name'] == competition_name][0]
+    #club = [c for c in clubs if c['name'] == club_name][0]
+    #club = get_club(request.form["club"])
+    club = next((c for c in clubs if c['name'] == club_name), None)
+   
+
+    try:
+        placesRequired = int(request.form['places'])
+    except ValueError:
+        flash("Please enter a number between 0 and 12.", "error")
+        return render_template("booking.html", club=club, competition=competition), 400
+    
+    placesRemaining = int(competition['numberOfPlaces'])
+    
+
+    if placesRequired > int(club["points"]):
+        flash("You don't have enough points.", "error")
+        return render_template("booking.html", club=club, competition=competition), 400
+
+    elif placesRequired > placesRemaining:
+        flash("Not enough places available, you are trying to book more than the remaining places.", "error")
+        return render_template("booking.html", club=club, competition=competition), 400
+
+    elif placesRequired > 12:
+        flash("You can't book more than 12 places in a competition.", "error")
+        return render_template("booking.html", club=club, competition=competition), 400
+    
+    else:
+        flash('Great-booking complete!')
+        club['points'] = int(club['points']) - placesRequired
+        competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
+    
+    return render_template('booking.html', club=club, competition=competition)
+    
 
 
-# TODO: Add route for points display
-# il faut que le tableau de points (bord) soit public par exemple sur la home page
-# faire une render template (charger les clubs et les afficher) pour afficher les points
-# faire des tests sur cette fonction
 
-@app.route('/logout')
+
+@app.route("/logout")
 def logout():
-    return redirect(url_for('index'))
+    return redirect(url_for("index"))
