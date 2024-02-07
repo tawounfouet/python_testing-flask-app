@@ -3,9 +3,14 @@ from server import app
 
 @pytest.fixture
 def client():
+    """
+    Fixture to create a test client for the Flask application.
+    """
     app.config['TESTING'] = True
     with app.test_client() as client:
         yield client
+
+
 
 @pytest.fixture
 def clubs():
@@ -39,7 +44,13 @@ def competitions():
             "name": "Fall Classic",
             "date": "2020-10-22 13:30:00",
             "numberOfPlaces": "13"
+        },
+        {
+            "name": "Winter Showdown",
+            "date": "2024-12-05 09:00:00",
+            "numberOfPlaces": "30"
         }
+
     ]
 
 @pytest.fixture
