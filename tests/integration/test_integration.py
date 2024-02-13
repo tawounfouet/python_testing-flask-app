@@ -54,3 +54,6 @@ def test_booking_process(client):
         'places': 12  # Un nombre délibérément élevé pour dépasser les places disponibles
     })
     assert b"Not enough places available" in response.data
+
+
+    # rajouter le logout

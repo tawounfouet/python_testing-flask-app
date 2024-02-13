@@ -130,6 +130,7 @@ def purchasePlaces():
 
     # Check if the number of places exceeds the limit.
     elif placesRequired > 12:
+        #Max_places = club['points'] # faire une condition pour vérifa
         flash("You can't book more than 12 places in a competition.", "error")
         return render_template("booking.html", club=club, competition=competition), 400
     
