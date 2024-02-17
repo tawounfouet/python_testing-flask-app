@@ -132,7 +132,7 @@ def purchasePlaces():
 
     placesRemaining = int(competition["numberOfPlaces"])
 
-    # Check if the club has enough points.
+    # Check if the club has enough points. - points fix here
     if placesRequired > int(club["points"]):
         flash("You don't have enough points.", "error")
         return render_template("booking.html", club=club, competition=competition), 400
@@ -145,7 +145,7 @@ def purchasePlaces():
         )
         return render_template("booking.html", club=club, competition=competition), 400
 
-    # Check if the number of places exceeds the limit.
+    # Check if the number of places exceeds the limit. - point fix here
     elif placesRequired > 12:
         # Max_places = club['points'] # faire une condition pour vérifa
         flash("You can't book more than 12 places in a competition.", "error")
@@ -155,7 +155,7 @@ def purchasePlaces():
         # Booking is successful.
         flash("Great-booking complete!")
         # flash(f'Great, succesfully booked {placesRequired} place(s)!')
-        # Update club points and competition places.
+        # Update club points and competition places. - points fix here
         club["points"] = int(club["points"]) - placesRequired
         competition["numberOfPlaces"] = (
             int(competition["numberOfPlaces"]) - placesRequired
