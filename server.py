@@ -28,6 +28,7 @@ def loadCompetitions():
 
 
 app = Flask(__name__)
+app.jinja_env.globals['datetime'] = datetime
 app.secret_key = "something_special"
 
 competitions = loadCompetitions()
@@ -49,10 +50,14 @@ def get_club(email):
 
 @app.route("/showSummary", methods=["POST"])
 def showSummary():
+
+    # Get current datetime
+    now = datetime.now()
+
     email = request.form["email"]
     club = get_club(email)
     if club is not None:
-        return render_template("welcome.html", club=club, competitions=competitions)
+        return render_template("welcome.html", club=club, competitions=competitions,  now=now)
     else:
         flash(f"Error: email {email} not found")
         return redirect(url_for("index"))
@@ -89,19 +94,18 @@ def book(competition, club):
                     "welcome.html",
                     club=foundClub,
                     competitions=competitions,
-                    clubs=clubs,
+                    clubs=clubs,        
                 ),
                 200,
             )
-        
         return render_template(
-            "booking.html", club=foundClub, competition=foundCompetition,
+            "booking.html", club=foundClub, competition=foundCompetition
         )
     else:
         flash("Something went wrong-please try again")
         return (
             render_template(
-                "welcome.html", club=foundClub, competitions=competitions,  clubs=clubs, 
+                "welcome.html", club=foundClub, clubs=clubs, now=now
             ),
             400,
         )
@@ -123,6 +127,7 @@ def purchasePlaces():
     # Search for the corresponding competition and club.
     try:
         competition = [c for c in competitions if c["name"] == competition_name][0]
+
     except IndexError:
         flash(f"Error: competition {competition_name} not found")
         return redirect(url_for("index"))
