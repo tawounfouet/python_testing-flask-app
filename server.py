@@ -126,7 +126,7 @@ def purchasePlaces():
     except IndexError:
         flash(f"Error: competition {competition_name} not found")
         return redirect(url_for("index"))
-    
+     
     club = next((c for c in clubs if c["name"] == club_name), None)
     if club is None:
         flash(f"Error: club {club_name} not found")
@@ -159,6 +159,12 @@ def purchasePlaces():
         # Max_places = club['points'] # faire une condition pour vérifa
         flash("You can't book more than 12 places in a competition.", "error")
         return render_template("booking.html", club=club, competition=competition), 400
+    
+    # Check if the number of places is negative.
+    elif placesRequired < 0:
+        flash("You can't book a negative number of places.", "error")
+        return render_template("booking.html", club=club, competition=competition), 400
+
 
     else:
         # Booking is successful.
