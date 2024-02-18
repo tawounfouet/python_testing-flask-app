@@ -93,15 +93,15 @@ def book(competition, club):
                 ),
                 200,
             )
-
+        
         return render_template(
-            "booking.html", club=foundClub, competition=foundCompetition
+            "booking.html", club=foundClub, competition=foundCompetition,
         )
     else:
         flash("Something went wrong-please try again")
         return (
             render_template(
-                "welcome.html", club=foundClub, competitions=competitions, clubs=clubs
+                "welcome.html", club=foundClub, competitions=competitions,  clubs=clubs, 
             ),
             400,
         )
@@ -121,8 +121,17 @@ def purchasePlaces():
     club_name = request.form.get("club")
 
     # Search for the corresponding competition and club.
-    competition = [c for c in competitions if c["name"] == competition_name][0]
+    try:
+        competition = [c for c in competitions if c["name"] == competition_name][0]
+    except IndexError:
+        flash(f"Error: competition {competition_name} not found")
+        return redirect(url_for("index"))
+    
     club = next((c for c in clubs if c["name"] == club_name), None)
+    if club is None:
+        flash(f"Error: club {club_name} not found")
+        return redirect(url_for("index"))
+
 
     try:
         placesRequired = int(request.form["places"])
