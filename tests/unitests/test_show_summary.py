@@ -19,7 +19,7 @@ def test_show_summary_ok(client, monkeypatch, competitions):
 
         return {"name": "Simply Lift", "email": "john@simplylift.co", "points": "13"}
 
-    monkeypatch.setattr(server, "getClub", patch_get_club)
+    #monkeypatch.setattr(server, "getClub", patch_get_club)
 
     monkeypatch.setattr(server, "competitions", competitions)
 
@@ -46,7 +46,7 @@ def test_show_summary_unknown_email(client, monkeypatch):
         return None
 
     # Utiliser monkeypatch pour remplacer getClub par patch_get_club
-    monkeypatch.setattr(server, "getClub", patch_get_club)
+    #monkeypatch.setattr(server, "getClub", patch_get_club)
 
     # Simuler l'envoi d'un email qui n'existe pas
     response = client.post("/showSummary", data={"email": "nonexistent@email.com"})
